@@ -625,6 +625,7 @@ const LS_ALL = "aiwuyou_all";
 const LS_LOCAL_CFG = "aiwuyou_local_config";
 const LS_LOCAL_ORDERS = "aiwuyou_local_orders";
 const LS_LOCAL_PRODUCTS = "aiwuyou_local_products";
+const LS_LOCAL_SERVICES = "aiwuyou_local_services";
 const STEP_NAMES = ["选项目", "选时间", "填信息", "确认"];
 const DEFAULT_CONFIG = { address: "示例路 88 号 3 层 301", phone: "138-0000-8888", wechat: "aiwuyou888", hours: "每日 09:00 - 20:00", pin: "8888" };
 
@@ -633,6 +634,7 @@ let localMode = false;
 let picked = { service: null, date: null, time: null, name: "", phone: "", note: "" };
 let serverBookings = [];
 let products = DEFAULT_PRODUCTS.slice();
+let services = SERVICES.slice();
 let config = { address: "", phone: "", wechat: "", hours: "每日 09:00 - 20:00" };
 let adminToken = sessionStorage.getItem(LS_TOKEN) || "";
 let adminBookings = [];
@@ -662,6 +664,10 @@ function localProducts() {
   try { const p = JSON.parse(localStorage.getItem(LS_LOCAL_PRODUCTS)); return Array.isArray(p) && p.length ? p : DEFAULT_PRODUCTS.slice(); }
   catch { return DEFAULT_PRODUCTS.slice(); }
 }
+function localServices() {
+  try { const s = JSON.parse(localStorage.getItem(LS_LOCAL_SERVICES)); return Array.isArray(s) && s.length ? s : SERVICES.slice(); }
+  catch { return SERVICES.slice(); }
+}
 function genLocalId(prefix) { return (prefix || "AYW") + Date.now().toString(36).toUpperCase().slice(-5); }
 
 async function api(path, opts = {}) {
@@ -677,12 +683,14 @@ async function api(path, opts = {}) {
 
 async function refreshBase() {
   try {
-    const [b, c, p] = await Promise.all([api("/api/bookings"), api("/api/config"), api("/api/products")]);
+    const [b, c, p, s] = await Promise.all([api("/api/bookings"), api("/api/config"), api("/api/products"), api("/api/services")]);
     serverBookings = b.bookings;
     config = Object.assign(config, c.config);
     products = p.products || products;
+    services = s.services || services;
     renderShop();
     renderProducts();
+    renderServices();
   } catch (e) {
     toast(e.message);
   }
@@ -695,7 +703,7 @@ function toast(msg) {
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.classList.remove("show"), 2200);
 }
-function serviceById(id) { return SERVICES.find((s) => s.id === id); }
+function serviceById(id) { return services.find((s) => s.id === id) || SERVICES[0]; }
 function fmtDate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
@@ -740,7 +748,7 @@ function saveMyOrders(list) { localStorage.setItem(LS_MY_ORDERS, JSON.stringify(
 function renderBrand() { $("#brandMark").innerHTML = svg("logo"); }
 
 function renderServices() {
-  $("#servicesGrid").innerHTML = SERVICES.map((s) => `
+  $("#servicesGrid").innerHTML = services.filter((s) => s.active !== false).map((s) => `
     <article class="service-card">
       <div class="service-img" style="background-image:url('${s.img}')">${svg(s.icon)}</div>
       <div class="service-body">
@@ -857,7 +865,7 @@ function renderBooking() {
 
 function step1HTML() {
   return `<div class="service-pick">
-    ${SERVICES.map((s) => `<button class="service-option ${picked.service === s.id ? "selected" : ""}" data-svc="${s.id}">
+    ${services.filter((s) => s.active !== false).map((s) => `<button class="service-option ${picked.service === s.id ? "selected" : ""}" data-svc="${s.id}">
       ${svg(s.icon)}<span><span class="t">${s.name}</span><br><span class="s">${s.duration} 分钟 · ${s.en}</span></span>
       <span class="p">¥${s.price}</span></button>`).join("")}
   </div>
@@ -1165,6 +1173,7 @@ async function renderAdmin() {
 
   const tabs = [
     ["bookings", "预约管理"],
+    ["services", "服务管理"],
     ["orders", "商品订单"],
     ["products", "商品管理"],
     ["settings", "门店设置"]
@@ -1194,9 +1203,73 @@ async function renderAdmin() {
 
   const body = $("#adminBody");
   if (adminView === "bookings") renderAdminBookings(body);
+  if (adminView === "services") renderAdminServices(body);
   if (adminView === "orders") renderAdminOrders(body);
   if (adminView === "products") renderAdminProducts(body);
   if (adminView === "settings") renderAdminSettings(body);
+}
+
+function renderAdminServices(body) {
+  body.innerHTML = `<div class="bookings-list">
+    ${services.map((s, i) => `<div class="product-edit">
+      <img src="${esc(s.img)}" alt="">
+      <div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr">
+          <div class="field"><label>服务名</label><input data-sfield="name" data-i="${i}" value="${esc(s.name)}"></div>
+          <div class="field"><label>价格</label><input data-sfield="price" data-i="${i}" type="number" value="${s.price}"></div>
+        </div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr">
+          <div class="field"><label>时长（分钟）</label><input data-sfield="duration" data-i="${i}" type="number" value="${s.duration}"></div>
+          <div class="field"><label>英文名</label><input data-sfield="en" data-i="${i}" value="${esc(s.en || "")}"></div>
+        </div>
+        <div class="field"><label>图片路径</label><input data-sfield="img" data-i="${i}" value="${esc(s.img)}"></div>
+        <div class="field"><label>描述</label><textarea data-sfield="desc" data-i="${i}">${esc(s.desc)}</textarea></div>
+        <label class="check"><input type="checkbox" data-sfield="active" data-i="${i}" ${s.active === false ? "" : "checked"}> 上架展示</label>
+      </div>
+      <button class="btn btn-danger btn-sm" data-sdel="${s.id}">删除</button>
+    </div>`).join("")}
+  </div>
+  <div class="step-actions" style="justify-content:flex-start">
+    <button class="btn btn-ghost" id="sAdd">新增服务</button>
+    <button class="btn btn-primary" id="sSave">保存服务</button>
+  </div>`;
+  document.querySelectorAll("#adminBody [data-sdel]").forEach((el) => {
+    el.addEventListener("click", () => {
+      services = services.filter((x) => x.id !== el.dataset.sdel);
+      renderAdmin();
+    });
+  });
+  document.querySelectorAll("#adminBody [data-sfield]").forEach((el) => {
+    el.addEventListener(el.type === "checkbox" ? "change" : "input", () => {
+      const i = Number(el.dataset.i);
+      const field = el.dataset.sfield;
+      if (field === "active") services[i].active = el.checked;
+      else if (field === "price" || field === "duration") services[i][field] = Number(el.value) || 0;
+      else services[i][field] = el.value;
+    });
+  });
+  $("#sAdd")?.addEventListener("click", () => {
+    services.push({ id: "s" + Date.now(), name: "新服务", en: "", duration: 30, price: 0, icon: "flame", desc: "", img: "images/moxa.png", active: true });
+    renderAdmin();
+  });
+  $("#sSave")?.addEventListener("click", saveServices);
+}
+
+async function saveServices() {
+  if (localMode) {
+    localStorage.setItem(LS_LOCAL_SERVICES, JSON.stringify(services));
+    renderServices();
+    renderAdmin();
+    toast("服务已保存");
+    return;
+  }
+  try {
+    const res = await api("/api/services", { method: "PUT", body: { services } });
+    services = res.services;
+    renderServices();
+    renderAdmin();
+    toast("服务已保存");
+  } catch (e) { toast(e.message); }
 }
 
 function renderAdminBookings(body) {
@@ -1448,9 +1521,11 @@ async function init() {
     config = localConfig();
     serverBookings = allBookingsLocal();
     products = localProducts();
+    services = localServices();
     if (adminToken) { adminBookings = allBookingsLocal(); adminOrders = allOrdersLocal(); }
     renderShop();
     renderProducts();
+    renderServices();
     if (adminToken) renderAdmin();
   } else {
     await refreshBase();

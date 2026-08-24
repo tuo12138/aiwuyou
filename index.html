@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>艾无忧 · 艾灸拔罐刮痧预约</title>
+<style>
+  :root {
+    --ink: #20302a;
+    --muted: #5c6c64;
+    --bg: #f5f3ee;
+    --surface: #ffffff;
+    --brand: #1d6b56;
+    --brand-dark: #14503f;
+    --brand-soft: #e3efe9;
+    --accent: #cf5c33;
+    --accent-soft: #fae9e0;
+    --line: #e1ddd4;
+    --danger: #b3402f;
+    --ok: #2f7d4f;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.55;
+    letter-spacing: 0;
+  }
+  img { display: block; max-width: 100%; }
+  button { font: inherit; cursor: pointer; }
+  input, textarea { font: inherit; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+  .muted { color: var(--muted); }
+  .section { padding: 64px 0; }
+  .section-title { font-size: 28px; line-height: 1.25; margin-bottom: 8px; }
+  .section-sub { color: var(--muted); margin-bottom: 28px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 18px;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    font-size: 15px;
+    white-space: nowrap;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+  }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .btn-primary { background: var(--brand); color: #fff; }
+  .btn-primary:hover { background: var(--brand-dark); }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { background: #b34a24; }
+  .btn-ghost { background: transparent; border-color: var(--line); color: var(--ink); }
+  .btn-ghost:hover { border-color: var(--brand); color: var(--brand); }
+  .btn-danger { background: var(--accent-soft); color: var(--danger); }
+  .btn-danger:hover { background: #f4d9cc; }
+  .btn-block { width: 100%; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-sm { height: 36px; padding: 0 12px; font-size: 13px; }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255,255,255,.96);
+    border-bottom: 1px solid var(--line);
+  }
+  .header-inner { display: flex; align-items: center; gap: 18px; height: 62px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; color: var(--brand-dark); text-decoration: none; }
+  .brand-mark { width: 36px; height: 36px; border-radius: 8px; background: var(--brand); color: #fff; display: grid; place-items: center; }
+  .brand-mark svg { width: 22px; height: 22px; }
+  .nav { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+  .nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: var(--radius);
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .nav a svg { width: 16px; height: 16px; }
+  .nav a:hover, .nav a.active { color: var(--brand); background: var(--brand-soft); }
+  .nav-cta { margin-left: 8px; height: 40px; }
+
+  .hero {
+    position: relative;
+    min-height: 560px;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    background-color: #183e33;
+    background-image: url("https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1600&q=80");
+    background-size: cover;
+    background-position: center;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, rgba(16,45,36,.88) 0%, rgba(16,45,36,.55) 55%, rgba(16,45,36,.18) 100%);
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 640px; padding: 72px 0; }
+  .hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    letter-spacing: .08em;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 999px;
+    padding: 6px 14px;
+    margin-bottom: 22px;
+  }
+  .hero h1 { font-size: 46px; line-height: 1.18; margin-bottom: 14px; }
+  .hero p { font-size: 17px; color: rgba(255,255,255,.88); max-width: 520px; margin-bottom: 28px; }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-facts { display: flex; gap: 28px; margin-top: 36px; flex-wrap: wrap; }
+  .hero-fact strong { display: block; font-size: 22px; }
+  .hero-fact span { font-size: 13px; color: rgba(255,255,255,.75); }
+
+  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .service-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .service-img {
+    height: 150px;
+    background: var(--brand-soft);
+    background-size: cover;
+    background-position: center;
+    display: grid;
+    place-items: center;
+    color: var(--brand);
+  }
+  .service-img svg { width: 42px; height: 42px; opacity: .85; }
+  .service-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .service-name { font-size: 18px; font-weight: 700; }
+  .service-meta { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); }
+  .service-price { color: var(--accent); font-weight: 700; font-size: 18px; }
+  .service-desc { font-size: 13px; color: var(--muted); flex: 1; }
+  .service-card .btn { margin-top: 8px; }
+
+  .booking-panel, .admin-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+  .steps { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; overflow-x: auto; }
+  .step {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--bg);
+    white-space: nowrap;
+  }
+  .step.active { background: var(--brand); color: #fff; }
+  .step.done { background: var(--brand-soft); color: var(--brand); }
+  .step-line { width: 18px; height: 1px; background: var(--line); flex: none; }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .field input, .field textarea {
+    width: 100%;
+    height: 46px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0 12px;
+    background: #fff;
+    color: var(--ink);
+    outline: none;
+  }
+  .field textarea { height: 88px; padding: 10px 12px; resize: vertical; }
+  .field input:focus, .field textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(29,107,86,.12); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+
+  .dates { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+  .date-chip {
+    flex: none;
+    width: 76px;
+    min-height: 72px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  .date-chip .d { font-size: 18px; font-weight: 700; }
+  .date-chip .w { font-size: 12px; color: var(--muted); }
+  .date-chip.selected { border-color: var(--brand); background: var(--brand); color: #fff; }
+  .date-chip.selected .w { color: rgba(255,255,255,.8); }
+
+  .slots { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 18px; }
+  .slot {
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--ink);
+    font-size: 14px;
+  }
+  .slot:hover:not(:disabled) { border-color: var(--brand); color: var(--brand); }
+  .slot.selected { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .slot:disabled { background: var(--bg); color: #b4bbb7; cursor: not-allowed; text-decoration: line-through; }
+
+  .service-pick { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .service-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    padding: 14px;
+    min-height: 76px;
+  }
+  .service-option svg { width: 22px; height: 22px; color: var(--brand); flex: none; }
+  .service-option .t { font-weight: 600; font-size: 15px; }
+  .service-option .s { font-size: 12px; color: var(--muted); }
+  .service-option .p { margin-left: auto; color: var(--accent); font-weight: 700; }
+  .service-option.selected { border-color: var(--brand); background: var(--brand-soft); }
+
+  .step-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 22px; }
+  .summary-box {
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    background: var(--bg);
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .summary-box div { font-size: 13px; }
+  .summary-box b { display: block; font-size: 15px; margin-top: 2px; }
+
+  .success { text-align: center; padding: 24px 12px; }
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--brand-soft);
+    color: var(--brand);
+    display: grid;
+    place-items: center;
+    margin: 0 auto 16px;
+  }
+  .success-icon svg { width: 32px; height: 32px; }
+  .success h3 { font-size: 22px; margin-bottom: 8px; }
+  .success .num {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 16px;
+    border: 1px dashed var(--brand);
+    border-radius: var(--radius);
+    color: var(--brand);
+    font-weight: 700;
+  }
+
+  .bookings-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .booking-item {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .booking-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .booking-top h4 { font-size: 16px; }
+  .booking-top .num { font-size: 12px; color: var(--muted); }
+  .booking-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 12px; font-size: 13px; color: var(--muted); }
+  .booking-actions { display: flex; gap: 8px; margin-top: auto; flex-wrap: wrap; }
+  .booking-actions .btn { height: 36px; padding: 0 12px; font-size: 13px; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: var(--brand-soft);
+    color: var(--brand);
+    white-space: nowrap;
+  }
+  .badge.warn { background: var(--accent-soft); color: var(--accent); }
+  .badge.gray { background: var(--bg); color: var(--muted); }
+  .badge.ok { background: #e3f2e8; color: var(--ok); }
+  .empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 0; }
+
+  .admin-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .admin-bar h3 { font-size: 18px; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-btn {
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .filter-btn.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .workbench-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+  .stat b { display: block; font-size: 26px; color: var(--brand); }
+  .stat span { font-size: 13px; color: var(--muted); }
+  .login-box { max-width: 340px; margin: 0 auto; padding: 30px 0; text-align: center; }
+  .login-box .field { text-align: left; }
+  .login-title { font-size: 20px; margin-bottom: 6px; }
+  .settings-form { max-width: 640px; }
+
+  .shop-band {
+    background: var(--brand-dark);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 32px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .shop-item { display: flex; gap: 12px; align-items: flex-start; }
+  .shop-item svg { width: 20px; height: 20px; flex: none; color: #ffd9a8; margin-top: 2px; }
+  .shop-item h4 { font-size: 15px; margin-bottom: 4px; }
+  .shop-item p { font-size: 13px; color: rgba(255,255,255,.82); }
+
+  footer { border-top: 1px solid var(--line); padding: 24px 0; text-align: center; color: var(--muted); font-size: 13px; }
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 900px) {
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero { min-height: 500px; }
+    .hero h1 { font-size: 36px; }
+    .booking-panel, .admin-panel { padding: 18px; }
+    .summary-box { grid-template-columns: 1fr 1fr; }
+    .shop-band { grid-template-columns: 1fr; }
+    .workbench-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .header-inner { height: 56px; gap: 10px; }
+    .brand { font-size: 17px; }
+    .brand-mark { width: 32px; height: 32px; }
+    .nav { overflow-x: auto; }
+    .nav a { padding: 0 8px; }
+    .nav a span { display: none; }
+    .nav-cta { display: none; }
+    .section { padding: 44px 0; }
+    .section-title { font-size: 24px; }
+    .hero { min-height: 440px; }
+    .hero h1 { font-size: 30px; }
+    .hero p { font-size: 15px; }
+    .hero-facts { gap: 18px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .service-pick { grid-template-columns: 1fr; }
+    .slots { grid-template-columns: repeat(3, 1fr); }
+    .bookings-list { grid-template-columns: 1fr; }
+    .step-actions { flex-direction: column-reverse; }
+    .step-actions .btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap header-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark" id="brandMark"></span>
+      艾无忧
+    </a>
+    <nav class="nav">
+      <a href="#services"><span>服务项目</span></a>
+      <a href="#booking"><span>在线预约</span></a>
+      <a href="#mine"><span>我的预约</span></a>
+      <a href="#shop"><span>门店信息</span></a>
+      <a href="#admin"><span>管理端</span></a>
+      <a class="btn btn-primary nav-cta" href="#booking">立即预约</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap hero-content">
+    <span class="hero-kicker">艾灸 · 拔罐 · 刮痧</span>
+    <h1>艾无忧</h1>
+    <p>以传统中医外治疗法，为都市生活驱寒祛湿、舒经活络。线上选项目、挑时间，到店即做，不再白跑。</p>
+    <div class="hero-actions">
+      <a class="btn btn-accent" href="#booking">立即预约</a>
+      <a class="btn btn-ghost" href="#services" style="color:#fff;border-color:rgba(255,255,255,.5)">查看项目</a>
+    </div>
+    <div class="hero-facts">
+      <div class="hero-fact"><strong>3</strong><span>核心外治疗法</span></div>
+      <div class="hero-fact"><strong>30-90</strong><span>分钟单次调理</span></div>
+      <div class="hero-fact"><strong id="heroHours">09:00-20:00</strong><span>每日营业</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="services">
+  <div class="wrap">
+    <h2 class="section-title">服务项目</h2>
+    <p class="section-sub">选好项目，约好时间，到店直接开始。</p>
+    <div class="services-grid" id="servicesGrid"></div>
+  </div>
+</section>
+
+<section class="section" id="booking">
+  <div class="wrap">
+    <h2 class="section-title">在线预约</h2>
+    <p class="section-sub">三步完成预约：选项目、挑时间、留联系方式。</p>
+    <div class="booking-panel">
+      <div class="steps" id="steps"></div>
+      <div id="stepBody"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mine">
+  <div class="wrap">
+    <h2 class="section-title">我的预约</h2>
+    <p class="section-sub">本机保存的预约记录，可随时查看或取消。</p>
+    <div class="bookings-list" id="myBookings"></div>
+  </div>
+</section>
+
+<section class="section" id="shop">
+  <div class="wrap">
+    <h2 class="section-title">门店信息</h2>
+    <p class="section-sub">有问题可直接电话或微信联系。</p>
+    <div class="shop-band">
+      <div class="shop-item" id="shopAddress"></div>
+      <div class="shop-item" id="shopContact"></div>
+      <div class="shop-item" id="shopHours"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="admin">
+  <div class="wrap">
+    <h2 class="section-title">管理端</h2>
+    <p class="section-sub">门店预约管理与营业设置。</p>
+    <div class="admin-panel" id="adminPanel"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">艾无忧 · 艾灸拔罐刮痧 · 预约到店</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ICONS = {
+  flame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+  circle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/></svg>',
+  wind: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>',
+  sparkles: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg>',
+  calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>',
+  logo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/><path d="m15 4 1.2 3.3L19.5 8.5l-3.3 1.2L15 13l-1.2-3.3L10.5 8.5l3.3-1.2z"/></svg>'
+};
+
+const SERVICES = [
+  { id: "moxa", name: "艾灸调理", en: "Moxibustion", duration: 45, price: 128, icon: "flame",
+    desc: "温经散寒、扶阳固本，适合寒湿体质、宫寒与疲劳人群。",
+    img: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=900&q=80" },
+  { id: "cupping", name: "拔罐祛湿", en: "Cupping", duration: 30, price: 88, icon: "circle",
+    desc: "行气活血、祛风散寒，重点缓解肩颈、腰背酸痛。",
+    img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=900&q=80" },
+  { id: "scraping", name: "刮痧舒络", en: "Guasha", duration: 30, price: 98, icon: "wind",
+    desc: "疏通经络、清热排毒，改善气血不畅与身体沉重感。",
+    img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=900&q=80" },
+  { id: "combo", name: "全身调理套餐", en: "Full Care", duration: 90, price: 268, icon: "sparkles",
+    desc: "艾灸+拔罐+刮痧一次到位，适合深度调理与放松。",
+    img: "https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=900&q=80" }
+];
+
+const LS_MY = "aiwuyou_my";
+const LS_ADMIN = "aiwuyou_admin_pin";
+const LS_ALL = "aiwuyou_all";
+const LS_LOCAL_CFG = "aiwuyou_local_config";
+const STEP_NAMES = ["选项目", "选时间", "填信息", "确认"];
+const DEFAULT_CONFIG = { address: "示例路 88 号 3 层 301", phone: "138-0000-8888", wechat: "aiwuyou888", hours: "每日 09:00 - 20:00", pin: "8888" };
+
+let step = 1;
+let localMode = false;
+let picked = { service: null, date: null, time: null, name: "", phone: "", note: "" };
+let serverBookings = [];
+let config = { address: "", phone: "", wechat: "", hours: "每日 09:00 - 20:00" };
+let adminPin = sessionStorage.getItem(LS_ADMIN) || "";
+let adminBookings = [];
+let adminFilter = "all";
+
+const $ = (sel) => document.querySelector(sel);
+const svg = (name) => ICONS[name] || "";
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function localConfig() {
+  try { return Object.assign({}, DEFAULT_CONFIG, JSON.parse(localStorage.getItem(LS_LOCAL_CFG)) || {}); }
+  catch { return Object.assign({}, DEFAULT_CONFIG); }
+}
+function saveLocalConfig(c) { localStorage.setItem(LS_LOCAL_CFG, JSON.stringify(c)); }
+function allBookingsLocal() {
+  try { return JSON.parse(localStorage.getItem(LS_ALL)) || []; } catch { return []; }
+}
+function saveAllLocal(list) { localStorage.setItem(LS_ALL, JSON.stringify(list)); }
+function genLocalId() { return "AYW" + Date.now().toString(36).toUpperCase().slice(-5); }
+
+async function api(path, opts = {}) {
+  const headers = Object.assign({}, opts.headers || {});
+  if (opts.body !== undefined) headers["Content-Type"] = "application/json";
+  if (adminPin) headers["X-Admin-Pin"] = adminPin;
+  const res = await fetch(path, Object.assign({}, opts, { headers, body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined }));
+  let data = {};
+  try { data = await res.json(); } catch {}
+  if (!res.ok) throw new Error(data.error || "请求失败");
+  return data;
+}
+
+async function refreshBase() {
+  try {
+    const [b, c] = await Promise.all([api("/api/bookings"), api("/api/config")]);
+    serverBookings = b.bookings;
+    config = Object.assign(config, c.config);
+    renderShop();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+function serviceById(id) { return SERVICES.find((s) => s.id === id); }
+function fmtDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function dateLabel(d) {
+  return { y: d.getFullYear(), m: String(d.getMonth() + 1).padStart(2, "0"), d: String(d.getDate()).padStart(2, "0") };
+}
+function weekdayCn(dateStr) {
+  return ["周日", "周一", "周二", "周三", "周四", "周五", "周六"][new Date(dateStr + "T00:00:00").getDay()];
+}
+function next7Days() {
+  const out = [];
+  const now = new Date();
+  for (let i = 0; i < 7; i++) out.push(fmtDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() + i)));
+  return out;
+}
+function slotTimes() {
+  const out = [];
+  for (let h = 9; h <= 19; h++) {
+    out.push(`${String(h).padStart(2, "0")}:00`);
+    if (h !== 19) out.push(`${String(h).padStart(2, "0")}:30`);
+  }
+  return out;
+}
+function isSlotPast(dateStr, time) {
+  if (dateStr !== fmtDate(new Date())) return false;
+  const [h, m] = time.split(":").map(Number);
+  const now = new Date();
+  return h * 60 + m <= now.getHours() * 60 + now.getMinutes();
+}
+function isSlotBooked(dateStr, time) {
+  return serverBookings.some((b) => b.date === dateStr && b.time === time && b.status !== "cancelled");
+}
+function myBookings() {
+  try { return JSON.parse(localStorage.getItem(LS_MY)) || []; } catch { return []; }
+}
+function saveMy(list) { localStorage.setItem(LS_MY, JSON.stringify(list)); }
+
+function renderBrand() { $("#brandMark").innerHTML = svg("logo"); }
+
+function renderServices() {
+  $("#servicesGrid").innerHTML = SERVICES.map((s) => `
+    <article class="service-card">
+      <div class="service-img" style="background-image:url('${s.img}')">${svg(s.icon)}</div>
+      <div class="service-body">
+        <div class="service-name">${s.name}</div>
+        <div class="service-meta"><span>${s.duration} 分钟</span><span class="service-price">¥${s.price}</span></div>
+        <p class="service-desc">${s.desc}</p>
+        <button class="btn btn-primary" data-book="${s.id}">${svg("calendar")}预约此项目</button>
+      </div>
+    </article>`).join("");
+  document.querySelectorAll("[data-book]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      picked.service = btn.dataset.book;
+      picked.date = null; picked.time = null;
+      step = 1;
+      renderBooking();
+      document.getElementById("booking").scrollIntoView({ behavior: "smooth" });
+    });
+  });
+}
+
+function renderSteps() {
+  $("#steps").innerHTML = STEP_NAMES.map((n, i) => {
+    const no = i + 1;
+    const cls = no === step ? "active" : no < step ? "done" : "";
+    return `<span class="step ${cls}">${no}. ${n}</span>${i < STEP_NAMES.length - 1 ? '<span class="step-line"></span>' : ""}`;
+  }).join("");
+}
+
+function renderBooking() {
+  renderSteps();
+  const body = $("#stepBody");
+  if (step === 1) body.innerHTML = step1HTML();
+  if (step === 2) body.innerHTML = step2HTML();
+  if (step === 3) body.innerHTML = step3HTML();
+  if (step === 4) body.innerHTML = step4HTML();
+  bindStepEvents();
+}
+
+function step1HTML() {
+  return `<div class="service-pick">
+    ${SERVICES.map((s) => `<button class="service-option ${picked.service === s.id ? "selected" : ""}" data-svc="${s.id}">
+      ${svg(s.icon)}<span><span class="t">${s.name}</span><br><span class="s">${s.duration} 分钟 · ${s.en}</span></span>
+      <span class="p">¥${s.price}</span></button>`).join("")}
+  </div>
+  <div class="step-actions"><span></span><button class="btn btn-primary" id="next1">${svg("calendar")}下一步</button></div>`;
+}
+
+function step2HTML() {
+  const days = next7Days();
+  const slots = slotTimes().map((t) => {
+    const disabled = isSlotPast(picked.date, t) || isSlotBooked(picked.date, t);
+    return `<button class="slot ${picked.time === t ? "selected" : ""}" data-time="${t}" ${disabled ? "disabled" : ""}>${t}</button>`;
+  }).join("");
+  return `<div class="dates">
+    ${days.map((d) => `<button class="date-chip ${picked.date === d ? "selected" : ""}" data-date="${d}">
+      <span class="w">${dateLabel(new Date(d + "T00:00:00")).m}/${dateLabel(new Date(d + "T00:00:00")).d} ${weekdayCn(d)}</span>
+      <span class="d">${dateLabel(new Date(d + "T00:00:00")).d}</span></button>`).join("")}
+  </div>
+  <div class="slots">${picked.date ? slots : '<p class="empty">请先选择日期</p>'}</div>
+  <div class="step-actions">
+    <button class="btn btn-ghost" id="prev2">上一步</button>
+    <button class="btn btn-primary" id="next2" ${picked.time ? "" : "disabled"}>${svg("calendar")}下一步</button>
+  </div>`;
+}
+
+function step3HTML() {
+  return `<div class="form-grid">
+    <div class="field"><label for="fName">姓名</label>
+      <input id="fName" value="${esc(picked.name)}" placeholder="怎么称呼您" autocomplete="name"></div>
+    <div class="field"><label for="fPhone">手机号</label>
+      <input id="fPhone" value="${esc(picked.phone)}" placeholder="用于到店确认" inputmode="numeric" maxlength="11" autocomplete="tel"></div>
+  </div>
+  <div class="field"><label for="fNote">备注</label>
+    <textarea id="fNote" placeholder="身体情况或偏好，选填">${esc(picked.note)}</textarea></div>
+  <div class="step-actions">
+    <button class="btn btn-ghost" id="prev3">上一步</button>
+    <button class="btn btn-primary" id="next3">${svg("check")}确认预约</button>
+  </div>`;
+}
+
+function step4HTML() {
+  const s = serviceById(picked.service);
+  const d = picked.date.split("-");
+  return `<div class="summary-box">
+    <div>项目<b>${s.name} · ${s.duration} 分钟</b></div>
+    <div>时间<b>${d[1]} 月 ${d[2]} 日 ${weekdayCn(picked.date)} ${picked.time}</b></div>
+    <div>费用<b>¥${s.price}（到店支付）</b></div>
+  </div>
+  <div class="step-actions">
+    <button class="btn btn-ghost" id="prev4">上一步</button>
+    <button class="btn btn-accent" id="submit">${svg("check")}提交预约</button>
+  </div>`;
+}
+
+function bindStepEvents() {
+  document.querySelectorAll("[data-svc]").forEach((el) => {
+    el.addEventListener("click", () => { picked.service = el.dataset.svc; renderBooking(); });
+  });
+  $("#next1")?.addEventListener("click", () => {
+    if (!picked.service) return toast("请先选择服务项目");
+    step = 2; renderBooking();
+  });
+  $("#prev2")?.addEventListener("click", () => { step = 1; renderBooking(); });
+  document.querySelectorAll(".date-chip").forEach((el) => {
+    el.addEventListener("click", () => { picked.date = el.dataset.date; picked.time = null; renderBooking(); });
+  });
+  document.querySelectorAll(".slot").forEach((el) => {
+    el.addEventListener("click", () => { picked.time = el.dataset.time; renderBooking(); });
+  });
+  $("#next2")?.addEventListener("click", () => { step = 3; renderBooking(); });
+  $("#prev3")?.addEventListener("click", () => { step = 2; renderBooking(); });
+  $("#next3")?.addEventListener("click", () => {
+    picked.name = $("#fName").value.trim();
+    picked.phone = $("#fPhone").value.trim();
+    picked.note = $("#fNote").value.trim();
+    if (!picked.name) return toast("请填写姓名");
+    if (!/^1\d{10}$/.test(picked.phone)) return toast("请填写 11 位手机号");
+    step = 4; renderBooking();
+  });
+  $("#prev4")?.addEventListener("click", () => { step = 3; renderBooking(); });
+  $("#submit")?.addEventListener("click", submitBooking);
+}
+
+async function submitBooking() {
+  if (isSlotBooked(picked.date, picked.time)) return toast("该时段已被预约");
+  const btn = $("#submit");
+  btn.disabled = true;
+  try {
+    let b;
+    if (localMode) {
+      b = {
+        id: genLocalId(), number: genLocalId(), name: picked.name, phone: picked.phone,
+        note: picked.note, serviceId: picked.service, date: picked.date, time: picked.time,
+        status: "confirmed", createdAt: new Date().toISOString()
+      };
+      const all = allBookingsLocal();
+      all.push(b);
+      saveAllLocal(all);
+      serverBookings = all;
+    } else {
+      const res = await api("/api/bookings", {
+        method: "POST",
+        body: {
+          name: picked.name, phone: picked.phone, note: picked.note,
+          serviceId: picked.service, date: picked.date, time: picked.time
+        }
+      });
+      b = res.booking;
+    }
+    const mine = myBookings();
+    mine.push(b);
+    saveMy(mine);
+    const s = serviceById(picked.service);
+    $("#stepBody").innerHTML = `<div class="success">
+      <div class="success-icon">${svg("check")}</div>
+      <h3>预约成功</h3>
+      <p class="muted">${s.name} · ${b.date} ${b.time} · ${esc(b.name)}</p>
+      <span class="num">预约号 ${b.number}</span>
+      <div class="step-actions" style="justify-content:center">
+        <button class="btn btn-primary" id="toMine">${svg("user")}查看我的预约</button>
+      </div></div>`;
+    renderSteps();
+    $("#toMine")?.addEventListener("click", () => document.getElementById("mine").scrollIntoView({ behavior: "smooth" }));
+    picked = { service: null, date: null, time: null, name: "", phone: "", note: "" };
+    if (!localMode) await refreshBase();
+    renderMyBookings();
+    if (adminPin) { if (localMode) adminBookings = allBookingsLocal(); await renderAdmin(); }
+    toast("预约已提交");
+  } catch (e) {
+    toast(e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function statusBadge(status) {
+  if (status === "cancelled") return '<span class="badge gray">已取消</span>';
+  if (status === "done") return '<span class="badge ok">已完成</span>';
+  return '<span class="badge">已确认</span>';
+}
+
+function bookingCard(b, admin) {
+  const s = serviceById(b.serviceId);
+  let actions = "";
+  if (admin) {
+    if (b.status === "confirmed") {
+      actions = `<button class="btn btn-ghost" data-done="${b.id}">${svg("check")}完成</button>
+                 <button class="btn btn-danger" data-cancel="${b.id}">${svg("x")}取消</button>`;
+    } else if (b.status === "done") {
+      actions = `<button class="btn btn-ghost" data-reopen="${b.id}">恢复</button>`;
+    }
+  } else if (b.status === "confirmed") {
+    actions = `<button class="btn btn-ghost" data-cancel="${b.id}">${svg("x")}取消预约</button>`;
+  }
+  return `<article class="booking-item">
+    <div class="booking-top">
+      <div><h4>${s.name}</h4><div class="num">${b.number || b.id}</div></div>
+      ${statusBadge(b.status)}
+    </div>
+    <div class="booking-info">
+      <span>日期：${b.date}</span><span>时间：${b.time}</span>
+      <span>联系人：${esc(b.name)}</span><span>电话：${esc(b.phone)}</span>
+      <span>时长：${s.duration} 分钟</span><span>费用：¥${s.price}</span>
+    </div>
+    ${b.note ? `<div class="muted" style="font-size:13px">备注：${esc(b.note)}</div>` : ""}
+    ${actions ? `<div class="booking-actions">${actions}</div>` : ""}
+  </article>`;
+}
+
+function renderMyBookings() {
+  const list = myBookings().slice().reverse();
+  $("#myBookings").innerHTML = list.length
+    ? list.map((b) => bookingCard(b, false)).join("")
+    : '<div class="empty">还没有预约记录</div>';
+  document.querySelectorAll("#myBookings [data-cancel]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const b = list.find((x) => x.id === btn.dataset.cancel);
+      if (localMode) {
+        const all = allBookingsLocal();
+        const t = all.find((x) => x.id === b.id);
+        if (t) t.status = "cancelled";
+        saveAllLocal(all);
+        serverBookings = all;
+        const mine = myBookings();
+        const m = mine.find((x) => x.id === b.id);
+        if (m) m.status = "cancelled";
+        saveMy(mine);
+        renderMyBookings();
+        if (adminPin) { adminBookings = all; renderAdmin(); }
+        toast("预约已取消");
+        return;
+      }
+      try {
+        await api(`/api/bookings/${b.id}`, { method: "PATCH", body: { status: "cancelled", phone: b.phone } });
+        const mine = myBookings();
+        const t = mine.find((x) => x.id === b.id);
+        if (t) t.status = "cancelled";
+        saveMy(mine);
+        renderMyBookings();
+        await refreshBase();
+        if (adminPin) await renderAdmin();
+        toast("预约已取消");
+      } catch (e) { toast(e.message); }
+    });
+  });
+}
+
+async function renderAdmin() {
+  const panel = $("#adminPanel");
+  if (!adminPin) {
+    panel.innerHTML = `<div class="login-box">
+      <div class="success-icon" style="width:56px;height:56px">${svg("lock")}</div>
+      <div class="login-title">管理端登录</div>
+      <div class="field"><label for="adminPinInput">管理密码</label>
+        <input id="adminPinInput" type="password" inputmode="numeric" maxlength="12" placeholder="请输入管理密码"></div>
+      <button class="btn btn-primary btn-block" id="adminLogin">${svg("lock")}进入管理端</button>
+    </div>`;
+    $("#adminLogin")?.addEventListener("click", async () => {
+      const pin = $("#adminPinInput").value.trim();
+      if (!pin) return toast("请输入密码");
+      if (localMode) {
+        if (pin !== localConfig().pin) return toast("密码错误");
+        adminPin = pin;
+        sessionStorage.setItem(LS_ADMIN, pin);
+        adminBookings = allBookingsLocal();
+        renderAdmin();
+        toast("登录成功");
+        return;
+      }
+      try {
+        await api("/api/bookings?full=1", { headers: { "X-Admin-Pin": pin } });
+        adminPin = pin;
+        sessionStorage.setItem(LS_ADMIN, pin);
+        await refreshAdmin();
+        toast("登录成功");
+      } catch (e) { toast(e.message); }
+    });
+    return;
+  }
+  const today = fmtDate(new Date());
+  const active = adminBookings.filter((b) => b.status !== "cancelled");
+  const todayList = active.filter((b) => b.date === today);
+  const revenue = todayList.reduce((sum, b) => sum + (serviceById(b.serviceId)?.price || 0), 0);
+  const filtered = adminBookings
+    .filter((b) => {
+      if (adminFilter === "today") return b.date === today;
+      if (adminFilter === "active") return b.status === "confirmed";
+      if (adminFilter === "done") return b.status === "done";
+      if (adminFilter === "cancelled") return b.status === "cancelled";
+      return true;
+    })
+    .sort((a, b2) => (b2.date + b2.time).localeCompare(a.date + a.time));
+  panel.innerHTML = `<div class="admin-bar">
+    <h3>${svg("settings")} 预约管理</h3>
+    <button class="btn btn-ghost btn-sm" id="adminLogout">退出登录</button>
+  </div>
+  <div class="workbench-stats">
+    <div class="stat"><b>${todayList.length}</b><span>今日预约</span></div>
+    <div class="stat"><b>¥${revenue}</b><span>今日营收预估</span></div>
+    <div class="stat"><b>${active.length}</b><span>有效预约</span></div>
+    <div class="stat"><b>${adminBookings.length}</b><span>全部订单</span></div>
+  </div>
+  <div class="filters" style="margin-bottom:18px">
+    ${[["all", "全部"], ["today", "今日"], ["active", "待服务"], ["done", "已完成"], ["cancelled", "已取消"]].map(([k, label]) =>
+      `<button class="filter-btn ${adminFilter === k ? "active" : ""}" data-filter="${k}">${label}</button>`).join("")}
+  </div>
+  <div class="bookings-list">${filtered.length ? filtered.map((b) => bookingCard(b, true)).join("") : '<div class="empty">暂无预约</div>'}</div>
+  <div style="border-top:1px solid var(--line);margin-top:24px;padding-top:20px">
+    <h3 style="font-size:18px;margin-bottom:14px">${svg("settings")} 门店设置</h3>
+    <div class="settings-form form-grid">
+      <div class="field"><label>门店地址</label><input id="cfgAddress" value="${esc(config.address)}"></div>
+      <div class="field"><label>联系电话</label><input id="cfgPhone" value="${esc(config.phone)}"></div>
+      <div class="field"><label>微信号</label><input id="cfgWechat" value="${esc(config.wechat)}"></div>
+      <div class="field"><label>营业时间</label><input id="cfgHours" value="${esc(config.hours)}"></div>
+      <div class="field"><label>修改管理密码（留空不改）</label><input id="cfgNewPin" type="password" placeholder="新密码"></div>
+      <div class="field" style="display:flex;align-items:flex-end">
+        <button class="btn btn-primary btn-block" id="cfgSave">保存设置</button>
+      </div>
+    </div>
+  </div>`;
+  $("#adminLogout")?.addEventListener("click", () => {
+    adminPin = "";
+    sessionStorage.removeItem(LS_ADMIN);
+    adminBookings = [];
+    renderAdmin();
+  });
+  document.querySelectorAll("[data-filter]").forEach((el) => {
+    el.addEventListener("click", () => { adminFilter = el.dataset.filter; renderAdmin(); });
+  });
+  document.querySelectorAll("#adminPanel [data-done]").forEach((el) => {
+    el.addEventListener("click", () => setAdminStatus(el.dataset.done, "done"));
+  });
+  document.querySelectorAll("#adminPanel [data-reopen]").forEach((el) => {
+    el.addEventListener("click", () => setAdminStatus(el.dataset.reopen, "confirmed"));
+  });
+  document.querySelectorAll("#adminPanel [data-cancel]").forEach((el) => {
+    el.addEventListener("click", () => setAdminStatus(el.dataset.cancel, "cancelled"));
+  });
+  $("#cfgSave")?.addEventListener("click", saveConfig);
+}
+
+async function setAdminStatus(id, status) {
+  if (localMode) {
+    const all = allBookingsLocal();
+    const t = all.find((x) => x.id === id);
+    if (t) t.status = status;
+    saveAllLocal(all);
+    adminBookings = all;
+    renderAdmin();
+    toast("已更新");
+    return;
+  }
+  try {
+    await api(`/api/bookings/${id}`, { method: "PATCH", body: { status } });
+    await refreshAdmin();
+    toast("已更新");
+  } catch (e) { toast(e.message); }
+}
+
+async function saveConfig() {
+  const vals = {
+    address: $("#cfgAddress").value.trim(),
+    phone: $("#cfgPhone").value.trim(),
+    wechat: $("#cfgWechat").value.trim(),
+    hours: $("#cfgHours").value.trim(),
+    newPin: $("#cfgNewPin").value.trim()
+  };
+  if (localMode) {
+    const cfg = localConfig();
+    if (adminPin !== cfg.pin) return toast("密码错误");
+    cfg.address = vals.address;
+    cfg.phone = vals.phone;
+    cfg.wechat = vals.wechat;
+    cfg.hours = vals.hours;
+    if (vals.newPin) cfg.pin = vals.newPin;
+    saveLocalConfig(cfg);
+    config = cfg;
+    $("#cfgNewPin").value = "";
+    renderShop();
+    renderAdmin();
+    toast("设置已保存");
+    return;
+  }
+  try {
+    const res = await api("/api/config", {
+      method: "PUT",
+      body: {
+        pin: adminPin,
+        address: vals.address,
+        phone: vals.phone,
+        wechat: vals.wechat,
+        hours: vals.hours,
+        newPin: vals.newPin
+      }
+    });
+    config = Object.assign(config, res.config);
+    if ($("#cfgNewPin").value.trim()) { $("#cfgNewPin").value = ""; }
+    renderShop();
+    renderAdmin();
+    toast("设置已保存");
+  } catch (e) { toast(e.message); }
+}
+
+async function refreshAdmin() {
+  if (localMode) {
+    adminBookings = allBookingsLocal();
+    renderAdmin();
+    return;
+  }
+  try {
+    const res = await api("/api/bookings?full=1");
+    adminBookings = res.bookings;
+    renderAdmin();
+  } catch (e) {
+    adminPin = "";
+    sessionStorage.removeItem(LS_ADMIN);
+    renderAdmin();
+  }
+}
+
+function renderShop() {
+  $("#shopAddress").innerHTML = `${svg("map")}<div><h4>门店地址</h4><p>${esc(config.address || "示例路 88 号 3 层 301")}</p></div>`;
+  $("#shopContact").innerHTML = `${svg("phone")}<div><h4>电话 / 微信</h4><p>${esc(config.phone || "138-0000-8888")}<br>微信：${esc(config.wechat || "aiwuyou888")}</p></div>`;
+  $("#shopHours").innerHTML = `${svg("clock")}<div><h4>营业时间</h4><p>${esc(config.hours || "每日 09:00 - 20:00")}</p></div>`;
+  $("#heroHours").textContent = (config.hours || "09:00-20:00").replace("每日 ", "").replace(" - ", "-");
+}
+
+async function init() {
+  renderBrand();
+  renderServices();
+  renderBooking();
+  renderMyBookings();
+  renderShop();
+  renderAdmin();
+  try {
+    const h = await fetch("/api/health");
+    localMode = !h.ok;
+  } catch {
+    localMode = true;
+  }
+  if (localMode) {
+    config = localConfig();
+    serverBookings = allBookingsLocal();
+    if (adminPin) adminBookings = allBookingsLocal();
+    renderShop();
+    if (adminPin) renderAdmin();
+  } else {
+    await refreshBase();
+    if (adminPin) await refreshAdmin();
+  }
+}
+init();
+</script>
+</body>
+</html>
